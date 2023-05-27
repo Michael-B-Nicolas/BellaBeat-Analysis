@@ -1,0 +1,148 @@
+---
+title: "BellaBeat"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## GitHub Documents
+
+This R Markdown document provides an analysis of the data collected from a fitness tracking application, FitBase. The dataset includes information on users' activity levels, sleep patterns, BMI, and other relevant metrics. The purpose of this document is to explore the relationship between sleep and activity levels, as well as tracking when users are mostly active during the day.
+
+
+##  Code
+
+
+
+```{r  path to the directory}
+setwd("/cloud/project/")
+```
+
+
+
+
+```{r Loading the necessary libraries }
+library(ggplot2)
+library(dplyr)
+```
+```{r Reading the data file}
+sleepData <- read.csv("sleepDay_merged_updated.csv")
+```
+
+```{r adjusting table}
+# Convert SleepDay column to Date type
+sleepData$SleepDay <- as.Date(sleepData$SleepDay)
+
+## Calculate the average Time In Bed and Time Asleep for each day of the week
+average_time <- aggregate(cbind(TotalTimeInBed, TotalMinutesAsleep) ~ format(SleepDay, "%A"), data = sleepData, FUN = mean)
+
+# Rename the columns
+colnames(average_time) <- c("Weekday", "AverageTimeInBed", "AverageTimeAsleep")
+
+# Print the resulting data
+print(average_time)
+```
+
+```{r scatter plotcode}
+# Create a bar plot with the number of minutes displayed above each bar
+bar_plot <- ggplot(average_time, aes(x = Weekday, y = AverageTimeInBed)) +
+  geom_bar(stat = "identity", fill = "dark grey") +
+  geom_text(aes(label = round(AverageTimeInBed)), vjust = -0.5) +
+  labs(title = "The Most Day Spent In Bed By Users",
+       x = "Day of the Week",
+       y = "Average Total Time in Bed") +
+  theme_minimal() +
+  ylim(0, 520)
+
+bar_plot
+
+```
+
+
+
+
+
+```{r visualizing the data}
+TimeActive <- read.csv("UsersMostlyActive.csv")
+
+# Reorder the levels of the x-axis variable based on average intensity in ascending order
+
+TimeActive$activity_time <- factor(TimeActive$activity_time, levels = TimeActive$activity_time[order(TimeActive$average_intensity, decreasing = FALSE)])
+
+barplot <- ggplot(TimeActive, aes(x = activity_time, y = average_intensity)) +
+  geom_bar(stat = "identity", fill = "dark grey") +
+  labs(title = "Users Most Active Time OF The Day",
+       x = "Time",
+       y = "Intensity") +
+  theme_minimal() +
+  geom_text(aes(label = activity_time, fontface = "bold"), vjust = -1.5 , size =1.8)
+
+# Display the bar chart with x labels on top of each bar
+print(barplot)
+```
+
+
+
+```{r visual}
+
+ ActivityVsSleep <- read.csv("ActivityAndSleep.csv")
+
+# Find the highest and lowest values of TotalMinutesAsleep
+max_minutes_asleep <- max(ActivityVsSleep$TotalMinutesAsleep)
+min_minutes_asleep <- min(ActivityVsSleep$TotalMinutesAsleep)
+
+# Create the visualization with the custom line segment
+ggplot(ActivityVsSleep, aes(x = non_ActiveMinutes, y = TotalMinutesAsleep)) +
+  geom_point(color = "red") +
+  geom_segment(aes(x = min(non_ActiveMinutes), y = max_minutes_asleep,
+                   xend = max(non_ActiveMinutes), yend = min_minutes_asleep),
+               color = "blue") +
+  labs(x = "Non-Active Minutes", y = "Total Minutes Asleep") +
+  ggtitle("Comparison of Non-Active Minutes and Total Minutes Asleep
+                             (Quality Sleep)") +
+  theme_minimal() +
+  xlim(0, 1500) +  # Adjust the x-axis range
+  ylim(0, 1000)    # Adjust the y-axis range
+
+
+```
+
+
+
+```{r reading table}
+activity_vs_bmi <- read.csv("Activity_BMI.csv")
+```
+
+```{r Visualizing the Table}
+
+# Calculate the sum of minutes spent active
+activity_vs_bmi$ActiveMinutes <- activity_vs_bmi$avg_VeryActiveMinutes +
+                                activity_vs_bmi$avg_FairlyActiveMinutes
+
+# Calculate the average non-active minutes
+activity_vs_bmi$avg_nonactiveminutes <- activity_vs_bmi$avg_SedentaryMinutes + activity_vs_bmi$avg_LightlyActiveMinutes
+
+# Create a line plot comparing avg_nonactiveminutes vs avg_BMI
+plot_nonactive <- ggplot(activity_vs_bmi, aes(x =  avg_nonactiveminutes, y = avg_BMI)) + 
+  
+  geom_point(color = rainbow(nrow(activity_vs_bmi)), size = 4)+
+  labs(y = "Average BMI", x = "Average Non-Active Minutes") 
+  
+  
+
+# Create a line plot comparing ActiveMinutes vs avg_BMI
+plot_active <- ggplot(activity_vs_bmi, aes(x = ActiveMinutes, y = avg_BMI )) +
+  geom_point(color = rainbow(nrow(activity_vs_bmi)), size = 4) +
+  labs(y = "Average BMI", x = "Minutes Spent Active") 
+  
+
+# Display the plots side by side
+library(gridExtra)
+grid.arrange(plot_nonactive, plot_active, ncol = 2 , top = "Comparison of Activity and Non-Activity by BMI")
+
+
+
+```
+
