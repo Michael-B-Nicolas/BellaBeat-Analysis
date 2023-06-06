@@ -1,42 +1,43 @@
-#BellaBeat Analysis Project
+# Data Analytics Portfolio
 
-The BellaBeat Analysis project focuses on extracting insights from Fitbit data. The goal was to gain a deeper understanding of user activity and health metrics captured by Fitbit devices.
+Welcome to my data analytics portfolio! This repository showcases my data analytics projects and analyses, demonstrating my skills in data analysis, visualization, and storytelling.
 
-Project Overview
-The project encompassed the following key steps:
+## Projects
 
-Data Cleaning: I performed data cleaning and preprocessing to ensure the quality and consistency of the data.
-Exploratory Data Analysis (EDA): I conducted exploratory data analysis to uncover patterns, distributions, and relationships within the data.
-Data Visualization: I created visually appealing and informative charts, graphs, and plots to present the findings.
+### Bellabeat Analysis
 
-Project Structure
-The project repository is structured as follows:
+In this project, I performed a comprehensive analysis of Bellabeat's fitness tracker data using Microsoft SQL, R, and Google Sheets. I explored various aspects of user behavior and provided insights and recommendations to improve the user experience. The project involved data cleaning, aggregation, statistical analysis, and data visualization.
 
-data: This folder contains the Fitbit data files used in the analysis.
-scripts: This folder contains the SQL scripts used for querying and extracting data from Microsoft SQL Server.
-notebooks: This folder contains the R notebooks used for data cleaning, EDA, and visualization.
-visualizations: This folder contains the visualizations generated during the analysis.
+- Repository: [Bellabeat Analysis]
+- Technologies: Microsoft SQL, R, Google Sheets
 
-Technologies and Tools Used
-The BellaBeat Analysis project was implemented using the following technologies and tools:
+### Video Games Sales Visualization
 
-Microsoft SQL Server: Used for querying and extracting Fitbit data from the Fitbase database.
-R: Utilized for data cleaning, exploratory data analysis, and visualization.
-R Packages: Various R packages such as dplyr, ggplot2, and tidyr were employed for data manipulation, analysis, and visualization.
-Google Sheets: Utilized as an intermediate step to download the tables created from the queries executed in Microsoft SQL Server before proceeding with the data analysis and visualization in R.
+For this project, I focused on visualizing video game sales data using Tableau. I analyzed sales trends, identified popular genres and platforms, and created interactive dashboards to explore the data. The project aimed to provide valuable insights for stakeholders in the gaming industry.
 
-Results and Findings
-The BellaBeat Analysis project yielded several significant insights, including:
+- Repository: [Video Games Sales Visualization]
+- Technologies: Tableau
 
-Daily activity patterns and trends.
-Correlations among different health metrics.
-Peak activity hours and sleep patterns.
-Activity level comparisons across different user segments.
-Recommendations for enhancing user engagement and product features.
-For a more detailed exploration of the findings and to view the visualizations, please refer to the project notebooks and visualizations folder.
+## Methodologies and Tools
 
-Contact Information
-I hope you find this BellaBeat Analysis project insightful and informative. For any inquiries, project collaborations, or further discussions, please feel free to reach out to me. You can connect with me on LinkedIn.
+In my data analytics projects, I employ various methodologies and tools, including:
 
-License
-This project is licensed under the MIT License, allowing for the free use, modification, and distribution of the code and findings for educational and non-commercial purposes.
+- Data cleaning and preprocessing
+- Exploratory data analysis (EDA)
+- Statistical analysis and hypothesis testing
+- Data visualization using tools like Tableau, Matplotlib, and Seaborn
+- SQL for data querying and manipulation
+- R for statistical analysis and data visualization
+
+## Repository Structure
+
+- `bellabeat-analysis/`: Contains files related to the Bellabeat analysis project, including data, code, and analysis notebooks.
+- `video-games-sales-visualization/`: Contains files related to the video games sales dashboard visualization project
+
+## Contact
+
+If you have any questions or would like to discuss potential collaborations, feel free to reach out to me:
+
+- LinkedIn: [Michael Bou Nicolas](link-to-your-linkedin-profile)
+
+Thank you for visiting my data analytics portfolio!
