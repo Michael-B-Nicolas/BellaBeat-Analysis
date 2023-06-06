@@ -1,0 +1,220 @@
+---
+title: "BellaBeat Analysis"
+author: "Michael Nicolas"
+date: "2023-05-30"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## GitHub Documents
+
+This R Markdown document provides an analysis of the data collected from a fitness tracking application, FitBase. The dataset includes information on users' activity levels, sleep patterns, BMI, and other relevant metrics. The purpose of this document is to explore the relationship between sleep and activity levels, as well as tracking when users are mostly active during the day.
+
+
+##  Code
+
+
+
+```{r  path to the directory}
+setwd("/cloud/project/")
+```
+
+
+
+
+```{r Loading the necessary libraries }
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+```
+
+```{r sorting the data }
+
+sleepData <- read.csv("sleepDay_updated.csv")
+
+# Convert DayOfWeek column to factor with correct order
+sleepData$DayOfWeek <- factor(sleepData$DayOfWeek, levels = c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"))
+
+# Create a new column with numeric representation of weekdays
+sleepData$DayNum <- as.integer(sleepData$DayOfWeek)
+
+# Aggregate the data by DayOfWeek and calculate the mean values
+aggData <- aggregate(cbind(AverageMinutesAsleep = TotalMinutesAsleep, AverageTimeInBed = TotalTimeInBed, DayNum) ~ DayOfWeek, sleepData, FUN = mean)
+
+# Order the aggregated data by the numeric representation of weekdays
+orderedData <- aggData[order(aggData$DayNum), ]
+
+# Remove the DayNum column from the final result
+orderedData$DayNum <- NULL
+
+# View the ordered data
+orderedData
+
+
+```
+```{r Visualizing Average Minutes Asleep}
+# Create a split bar plot for AverageMinutesAsleep (ordered descending)
+minutes_asleep_plot <- ggplot(orderedData, aes(x = reorder(DayOfWeek, -AverageMinutesAsleep), y = AverageMinutesAsleep)) +
+  geom_bar(stat = "identity", fill = "dark red", width = 0.6) +
+  geom_text(aes(label = round(AverageMinutesAsleep)), vjust = -0.5) +
+  labs(title = "Average Minutes Asleep by Day",
+       x = "Day of the Week",
+       y = "Average Minutes Asleep") +
+  theme_minimal() +
+  ylim(0, max(orderedData$AverageMinutesAsleep) * 1)
+
+minutes_asleep_plot
+
+```
+
+
+
+
+```{r Visualizing Average Time in Bed}
+# Create a bar plot with the number of minutes displayed above each bar
+bar_plot <- ggplot(orderedData, aes(x = reorder(DayOfWeek,  -AverageTimeInBed), y=AverageTimeInBed) ) +
+  geom_bar(stat = "identity", fill = "dark violet") +
+  geom_text(aes(label = round(AverageTimeInBed)), vjust = -0.5) +
+  labs(title = "Average Time Spent in Bed by Day of the Week",
+       x = "Day of the Week",
+       y = "Average Time in Bed (minutes)") +
+  theme_minimal() +
+  ylim(0, max(orderedData$AverageTimeInBed) * 1.1)
+
+bar_plot
+
+```
+```{r}
+TimeActive <- read_csv("UsersMostlyActive.csv", col_types = "c")
+
+
+
+# Reorder the levels of the x-axis variable based on a clockwise order starting from 12:00 am
+TimeActive$activity_time <- factor(TimeActive$activity_time,
+                                   levels = c("12:00 AM", "1:00 AM", "2:00 AM", "3:00 AM", "4:00 AM", "5:00 AM",
+                                              "6:00 AM", "7:00 AM", "8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM",
+                                              "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM",
+                                              "6:00 PM", "7:00 PM", "8:00 PM", "9:00 PM", "10:00 PM", "11:00 PM"))
+
+# Create the bar plot
+barplot <- ggplot(TimeActive, aes(x = activity_time, y = average_intensity)) +
+  geom_bar(stat = "identity", fill = "dark blue") +
+  labs(title = "Users Most and Least Active Time of the Day",
+       x = "Time",
+       y = "Intensity") +
+  theme_minimal() +
+  geom_text(aes(label = activity_time, fontface = "bold"), vjust = -1.5, size = 1.8) +
+  theme(axis.text.x = element_blank())
+
+# Display the bar chart
+print(barplot)
+
+```
+
+
+
+
+
+
+
+```{r comparison of Non-Active Minutes and Total Minutes Asleep}
+
+ ActivityVsSleep <- read.csv("ActivityAndSleep.csv")
+
+# Find the highest and lowest values of TotalMinutesAsleep
+max_minutes_asleep <- max(ActivityVsSleep$TotalMinutesAsleep)
+min_minutes_asleep <- min(ActivityVsSleep$TotalMinutesAsleep)
+
+# Create the visualization with the custom line segment
+ggplot(ActivityVsSleep, aes(x = non_ActiveMinutes, y = TotalMinutesAsleep)) +
+  geom_point(color = "red") +
+  geom_segment(aes(x = min(non_ActiveMinutes), y = max_minutes_asleep,
+                   xend = max(non_ActiveMinutes), yend = min_minutes_asleep),
+               color = "blue") +
+  labs(x = "Non-Active Minutes", y = "Total Minutes Asleep") +
+  ggtitle("comparison of Non-Active Minutes and Total Minutes Asleep
+                             (Quality Sleep)") +
+  theme_minimal() +
+  xlim(0, 1500) +  # Adjust the x-axis range
+  ylim(0, 1000)    # Adjust the y-axis range
+
+
+```
+
+
+
+```{r reading table}
+activity_vs_bmi <- read.csv("Activity_BMI.csv")
+```
+
+```{r comparing ActiveMinutes vs avg_BMI}
+
+# Calculate the sum of minutes spent active
+activity_vs_bmi$ActiveMinutes <- activity_vs_bmi$avg_VeryActiveMinutes +
+                                activity_vs_bmi$avg_FairlyActiveMinutes
+
+# Calculate the average non-active minutes
+activity_vs_bmi$avg_nonactiveminutes <- activity_vs_bmi$avg_SedentaryMinutes + activity_vs_bmi$avg_LightlyActiveMinutes
+
+# Create a line plot comparing avg_nonactiveminutes vs avg_BMI
+plot_nonactive <- ggplot(activity_vs_bmi, aes(x =  avg_nonactiveminutes, y = avg_BMI)) + 
+  
+  geom_point(color = rainbow(nrow(activity_vs_bmi)), size = 4)+
+  labs(y = "Average BMI", x = "Average Non-Active Minutes") 
+  
+  
+
+# Create a line plot comparing ActiveMinutes vs avg_BMI
+plot_active <- ggplot(activity_vs_bmi, aes(x = ActiveMinutes, y = avg_BMI )) +
+  geom_point(color = rainbow(nrow(activity_vs_bmi)), size = 4) +
+  labs(y = "Average BMI", x = "Minutes Spent Active") 
+  
+
+# Display the plots side by side
+library(gridExtra)
+grid.arrange(plot_nonactive, plot_active, ncol = 2 , top = "Comparison of Activity and Non-Activity by BMI")
+
+
+
+```
+
+
+
+
+```{r  relationship between activity level and calories burnt}
+library(ggplot2)
+library(cowplot)
+
+# Create subset data based on the condition
+subset_data <- subset(activity_data, (VeryActiveMinutes > 0 | FairlyActiveMinutes > 0 | LightlyActiveMinutes > 0 | SedentaryMinutes > 0) & Calories > 0)
+
+# Create four separate visuals comparing each column with calories
+plot1 <- ggplot(subset_data, aes(x = VeryActiveMinutes, y = Calories)) +
+  geom_point(color = "dark cyan") +
+  geom_smooth(method = "lm", se = FALSE, color = "red") 
+
+plot2 <- ggplot(subset_data, aes(x = FairlyActiveMinutes, y = Calories)) +
+  geom_point(color = "dark cyan") +
+  geom_smooth(method = "lm", se = FALSE, color = "orange") 
+
+plot3 <- ggplot(subset_data, aes(x = LightlyActiveMinutes, y = Calories)) +
+  geom_point(color = "dark cyan") +
+  geom_smooth(method = "lm", se = FALSE, color = "yellow") 
+
+plot4 <- ggplot(subset_data, aes(x = SedentaryMinutes, y = Calories)) +
+  geom_point(color = "dark cyan") +
+  geom_smooth(method = "lm", se = FALSE, color = "green") 
+
+# Arrange the four plots in a single row
+combined_plot <- plot_grid(plot1, plot2, plot3, plot4, nrow = 1)
+
+# Display the combined plot
+print(combined_plot)
+
+```
+
+
