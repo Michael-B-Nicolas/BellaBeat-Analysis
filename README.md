@@ -41,6 +41,6 @@ In my data analytics projects, I employ various methodologies and tools, includi
 
 If you have any questions or would like to discuss potential collaborations, feel free to reach out to me:
 
-- LinkedIn: [Michel Nicolas](www.linkedin.com/in/michel-nicolas-75b39b277)
+- LinkedIn: [Michel Nicolas](https://www.linkedin.com/in/michel-nicolas-75b39b277)
 
 Thank you for visiting my data analytics portfolio!
